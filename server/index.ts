@@ -125,6 +125,16 @@ app.post("/api/generate", async (req, res) => {
   }
 });
 
+// 생성 상태 조회
+app.get(
+  "/api/generate/status",
+  (_req, res) => {
+    return res.json(
+      generateStatus
+    );
+  }
+);
+
 // 게시물 삭제
 app.delete("/posts/:id", async (req, res) => {
   try {
