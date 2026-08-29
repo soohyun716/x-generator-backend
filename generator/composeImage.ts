@@ -12,7 +12,7 @@ export async function composeImage({
   const width = 1080;
   const photoHeight = 720;
 
-  const fontSize = 36;
+  const fontSize = 39;
   const lineHeight = 58;
 
   const paddingTop = 90;
@@ -94,7 +94,7 @@ export async function composeImage({
         x="${width / 2}"
         y="${textHeight / 2}"
         font-size="40"
-        font-family="'Noto Sans KR', 'Noto Sans CJK KR', 'Malgun Gothic', Arial, sans-serif"
+        font-family="Noto Sans CJK KR"
         font-weight="400"
         fill="#000000"
         fill-opacity="0.05"
