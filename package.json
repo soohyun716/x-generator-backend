@@ -1,0 +1,32 @@
+{
+  "name": "meme-generator",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "generate": "tsx generator/runBatch.ts",
+    "server": "tsx server/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.116.0",
+    "@aws-sdk/client-s3": "^3.1118.0",
+    "cloudinary": "^2.10.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "firebase": "^12.17.1",
+    "firebase-admin": "^14.2.0",
+    "openai": "^7.4.0",
+    "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}
