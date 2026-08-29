@@ -148,7 +148,19 @@ function saveCategoryIndex(index: number) {
   );
 }
 
-export async function runBatch(total: number) {
+export interface BatchProgress {
+  current: number;
+  total: number;
+  successCount: number;
+  failCount: number;
+}
+
+export async function runBatch(
+  total: number,
+  onProgress?: (
+    progress: BatchProgress
+  ) => void
+) {
   if (!Number.isInteger(total) || total < 1) {
     throw new Error(
       "생성 개수는 1 이상의 정수여야 합니다."
@@ -169,16 +181,15 @@ export async function runBatch(total: number) {
   );
 
   console.log(
-    `시작 카테고리: ${
-      STORY_CATEGORIES[currentCategoryIndex]
+    `시작 카테고리: ${STORY_CATEGORIES[currentCategoryIndex]
     }`
   );
 
   for (let i = 1; i <= total; i++) {
     const category =
       STORY_CATEGORIES[
-        currentCategoryIndex %
-          STORY_CATEGORIES.length
+      currentCategoryIndex %
+      STORY_CATEGORIES.length
       ];
 
     const targetLength = getRandomLength();
@@ -259,6 +270,12 @@ export async function runBatch(total: number) {
 
       console.error(error);
     }
+    onProgress?.({
+      current: i,
+      total,
+      successCount,
+      failCount,
+    });
   }
 
   console.log("\n==============================");
@@ -269,8 +286,7 @@ export async function runBatch(total: number) {
   console.log(`실패: ${failCount}개`);
 
   console.log(
-    `다음 실행 시작 카테고리: ${
-      STORY_CATEGORIES[currentCategoryIndex]
+    `다음 실행 시작 카테고리: ${STORY_CATEGORIES[currentCategoryIndex]
     }`
   );
 

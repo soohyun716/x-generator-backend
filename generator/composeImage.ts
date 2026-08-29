@@ -12,14 +12,14 @@ export async function composeImage({
   const width = 1080;
   const photoHeight = 720;
 
-  const fontSize = 40;
-  const lineHeight = 58;
+  const fontSize = 42;
+  const lineHeight = 65;
 
   const paddingTop = 90;
   const paddingBottom = 80;
   const paddingX = 70;
 
-  const maxCharsPerLine = 28;
+  const maxCharsPerLine = 25;
 
   const escapeXml = (text: string) =>
     text
