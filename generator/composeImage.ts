@@ -12,7 +12,7 @@ export async function composeImage({
   const width = 1080;
   const photoHeight = 720;
 
-  const fontSize = 39;
+  const fontSize = 40;
   const lineHeight = 58;
 
   const paddingTop = 90;
