@@ -6,8 +6,6 @@ import { generateImage } from "./generateImage.js";
 import { composeImage } from "./composeImage.js";
 import { savePost } from "./savePost.js";
 
-const TOTAL = 30;
-
 const STORY_CATEGORIES = [
   "장례식장",
   "회사야근",
@@ -110,13 +108,14 @@ const STORY_CATEGORIES = [
   "장거리연애",
   "공항면세점",
   "한강공원",
-  "렌터카여행"
+  "렌터카여행",
 ];
-
 
 const STORY_LENGTHS = [200, 300, 400];
 
-const PROGRESS_FILE = path.resolve("generator/categoryProgress.json");
+const PROGRESS_FILE = path.resolve(
+  "generator/categoryProgress.json"
+);
 
 function getRandomLength(): number {
   return STORY_LENGTHS[
@@ -149,14 +148,20 @@ function saveCategoryIndex(index: number) {
   );
 }
 
-async function main() {
+export async function runBatch(total: number) {
+  if (!Number.isInteger(total) || total < 1) {
+    throw new Error(
+      "생성 개수는 1 이상의 정수여야 합니다."
+    );
+  }
+
   let successCount = 0;
   let failCount = 0;
 
   let currentCategoryIndex = getCategoryIndex();
 
   console.log(
-    `총 ${TOTAL}개 콘텐츠 생성을 시작합니다.`
+    `총 ${total}개 콘텐츠 생성을 시작합니다.`
   );
 
   console.log(
@@ -164,25 +169,27 @@ async function main() {
   );
 
   console.log(
-    `시작 카테고리: ${STORY_CATEGORIES[currentCategoryIndex]}`
+    `시작 카테고리: ${
+      STORY_CATEGORIES[currentCategoryIndex]
+    }`
   );
 
-  for (let i = 1; i <= TOTAL; i++) {
+  for (let i = 1; i <= total; i++) {
     const category =
       STORY_CATEGORIES[
-        currentCategoryIndex % STORY_CATEGORIES.length
+        currentCategoryIndex %
+          STORY_CATEGORIES.length
       ];
 
     const targetLength = getRandomLength();
 
     console.log("\n==============================");
-    console.log(`[${i}/${TOTAL}] 생성 시작`);
+    console.log(`[${i}/${total}] 생성 시작`);
     console.log(`카테고리: ${category}`);
     console.log(`목표 길이: 약 ${targetLength}자`);
     console.log("==============================");
 
     try {
-      // 1. 스토리 생성
       console.log("스토리 생성 중...");
 
       const story = await generateStory(
@@ -201,7 +208,6 @@ async function main() {
         `실제 길이: ${actualLength}자`
       );
 
-      // 2. 이미지 생성
       console.log("이미지 생성 중...");
 
       const rawImageBuffer =
@@ -211,7 +217,6 @@ async function main() {
 
       console.log("이미지 생성 완료");
 
-      // 3. 이미지 + body 합성
       console.log("이미지 합성 중...");
 
       const finalImageBuffer =
@@ -222,7 +227,6 @@ async function main() {
 
       console.log("이미지 합성 완료");
 
-      // 4. Cloudinary + Firestore 저장
       console.log("저장 중...");
 
       const saved = await savePost({
@@ -232,20 +236,13 @@ async function main() {
 
       successCount++;
 
-      console.log(`[${i}/${TOTAL}] 완료`);
+      console.log(`[${i}/${total}] 완료`);
       console.log("Post ID:", saved.id);
 
-      /*
-       * 이 콘텐츠가 완전히 성공했을 때만
-       * 다음 카테고리로 이동
-       */
       currentCategoryIndex =
         (currentCategoryIndex + 1) %
         STORY_CATEGORIES.length;
 
-      /*
-       * 성공할 때마다 진행 위치 저장
-       */
       saveCategoryIndex(
         currentCategoryIndex
       );
@@ -257,11 +254,10 @@ async function main() {
       failCount++;
 
       console.error(
-        `[${i}/${TOTAL}] 생성 실패`
+        `[${i}/${total}] 생성 실패`
       );
 
       console.error(error);
-
     }
   }
 
@@ -277,9 +273,10 @@ async function main() {
       STORY_CATEGORIES[currentCategoryIndex]
     }`
   );
-}
 
-main().catch((error) => {
-  console.error("배치 실행 오류:");
-  console.error(error);
-});
+  return {
+    requested: total,
+    successCount,
+    failCount,
+  };
+}
