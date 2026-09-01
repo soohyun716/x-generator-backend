@@ -24,7 +24,15 @@ let generateStatus: GenerateStatus = {
 };
 const app = express();
 
-app.use(cors());
+// app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://x-generator-private.vercel.app",
+    ],
+  })
+);
 app.use(express.json());
 
 // 컨텐츠 생성
@@ -172,6 +180,7 @@ const PORT = Number(process.env.PORT) || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`API server running on port ${PORT}`);
 });
+
 
 app.get("/api/image-proxy", async (req, res) => {
   try {
