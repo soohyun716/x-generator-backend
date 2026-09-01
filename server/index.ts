@@ -27,7 +27,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 콘텐츠 생성
+// 컨텐츠 생성
 app.post("/api/generate", async (req, res) => {
   try {
     const count = Number(req.body.count);
@@ -55,7 +55,7 @@ app.post("/api/generate", async (req, res) => {
       return res.status(409).json({
         success: false,
         message:
-          "이미 콘텐츠를 생성하고 있습니다.",
+          "이미 컨텐츠를 생성하고 있습니다.",
         status: generateStatus,
       });
     }
@@ -69,7 +69,7 @@ app.post("/api/generate", async (req, res) => {
     };
 
     console.log(
-      `콘텐츠 ${count}개 생성 시작`
+      `컨텐츠 ${count}개 생성 시작`
     );
 
     const result = await runBatch(
@@ -97,18 +97,18 @@ app.post("/api/generate", async (req, res) => {
     };
 
     console.log(
-      `콘텐츠 ${count}개 생성 완료`
+      `컨텐츠 ${count}개 생성 완료`
     );
 
     return res.json({
       success: true,
       message:
-        `${count}개 콘텐츠 생성이 완료되었습니다.`,
+        `${count}개 컨텐츠 생성이 완료되었습니다.`,
       result,
     });
   } catch (error) {
     console.error(
-      "콘텐츠 생성 오류:",
+      "컨텐츠 생성 오류:",
       error
     );
 
@@ -120,7 +120,7 @@ app.post("/api/generate", async (req, res) => {
     return res.status(500).json({
       success: false,
       message:
-        "콘텐츠 생성 중 오류가 발생했습니다.",
+        "컨텐츠 생성 중 오류가 발생했습니다.",
     });
   }
 });
@@ -171,4 +171,56 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`API server running on port ${PORT}`);
+});
+
+app.get("/api/image-proxy", async (req, res) => {
+  try {
+    const imageUrl = req.query.url as string;
+
+    if (!imageUrl) {
+      return res.status(400).json({
+        message: "이미지 URL이 없습니다.",
+      });
+    }
+
+    // R2 주소만 허용
+    const parsedUrl = new URL(imageUrl);
+
+    if (!parsedUrl.hostname.endsWith(".r2.dev")) {
+      return res.status(400).json({
+        message: "허용되지 않은 이미지 URL입니다.",
+      });
+    }
+
+    const response = await fetch(imageUrl);
+
+    if (!response.ok) {
+      throw new Error(
+        `이미지 요청 실패: ${response.status}`
+      );
+    }
+
+    const contentType =
+      response.headers.get("content-type") ||
+      "image/jpeg";
+
+    const arrayBuffer =
+      await response.arrayBuffer();
+
+    res.setHeader(
+      "Content-Type",
+      contentType
+    );
+
+    res.send(Buffer.from(arrayBuffer));
+  } catch (error) {
+    console.error(
+      "이미지 프록시 오류:",
+      error
+    );
+
+    res.status(500).json({
+      message: "이미지 요청 실패",
+    });
+  }
 });
